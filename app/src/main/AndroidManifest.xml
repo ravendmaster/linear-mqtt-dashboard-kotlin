@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ravendmaster.linearmqttdashboard">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--<uses-permission android:name="com.android.vending.BILLING" /> !-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:largeHeap="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/MyTheme">
+
+
+        <activity android:name=".activity.MainActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/linear"/>
+                <data android:scheme="http"    android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear"/>
+                <data android:scheme="https"   android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear"/>
+                <data android:scheme="content" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear"/>
+                <data android:scheme="file"    android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear" />
+                <data android:scheme="file"    android:host="*" android:mimeType="*/*" android:pathPattern=".*\\..*\\.linear" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/linear"/>
+                <data android:scheme="content" android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear"/>
+                <data android:scheme="file"    android:host="*" android:mimeType="*/*" android:pathPattern=".*\\.linear" />
+                <data android:scheme="file"    android:host="*" android:mimeType="*/*" android:pathPattern=".*\\..*\\.linear" />
+            </intent-filter>
+
+        </activity>
+<!--
+        <activity android:name=".activity.HomeScreenWidgetConfigActivity">
+            <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+        </activity>
+!-->
+        <activity android:name=".activity.WidgetEditorActivity" />
+        <activity android:name=".activity.AppSettingsActivity" />
+
+        <service
+            android:name=".service.MQTTService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver android:name=".service.AutoStart">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".activity.TabsActivity" />
+        <activity android:name=".activity.OpenFileActivity" />
+
+        <!--
+                <receiver
+                    android:name=".HomeScreenWidget"
+                    android:icon="@android:drawable/star_big_on"
+                    android:label="@string/home_screen_widget_name">
+                    <intent-filter>
+                        <action
+                            android:name="android.appwidget.action.APPWIDGET_UPDATE">
+                        </action>
+                    </intent-filter>
+                    <meta-data
+                        android:name="android.appwidget.provider"
+                        android:resource="@xml/widget_metadata">
+                    </meta-data>
+                </receiver>
+     !-->
+
+    </application>
+</manifest>
