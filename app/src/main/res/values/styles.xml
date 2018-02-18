@@ -22,6 +22,8 @@
         <item name="colorAccent">#95009f</item>
         <!-- You can also set colorControlNormal, colorControlActivated
             colorControlHighlight and colorSwitchThumbNormal. -->
+
+        <!-- <item name="android:windowBackground">@color/cardview_dark_background</item> -->
     </style>
 
     <style name="SpinnerDefaultTheme" parent="android:style/Widget.ListView.DropDown">
