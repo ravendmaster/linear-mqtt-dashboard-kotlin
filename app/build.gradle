@@ -9,8 +9,8 @@ android {
         applicationId 'com.ravendmaster.linearmqttdashboard'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 254
-        versionName "2.4.1"
+        versionCode 255
+        versionName "2.4.2"
     }
     buildTypes {
         release {

@@ -11,6 +11,7 @@ import java.util.UUID
 
 class WidgetData {
 
+
     var noUpdate = false
 
     val topicSuffix: String
@@ -28,6 +29,12 @@ class WidgetData {
 
     var type: WidgetTypes
     internal var names = arrayOfNulls<String>(4)
+
+    fun isSystem():Boolean{
+        if((names[0]!!.length<1) || (names[0]!!.get(0)!='%'))return false;
+
+        return true;
+    }
 
     var subscribeTopic = ""
     var publishTopic = ""

@@ -47,17 +47,20 @@ class CallbackMQTTClient(internal var imqttMessageReceiver: IMQTTMessageReceiver
     fun publish(topic: String, payload: Buffer, retained: Boolean) {
 
         if (callbackConnection == null ) {
+            isConnected = false
             return
         }
+        Log.d(javaClass.name, "publish() "+topic)
 
         callbackConnection!!.publish(topic, payload.toByteArray(), QoS.AT_LEAST_ONCE, retained, object : Callback<Void> {
 
             override fun onSuccess(p0: Void?) {
                 isConnected = true
-                Log.d(javaClass.name, "PUBLISH SUCCESS")
+                //Log.d(javaClass.name, "PUBLISH SUCCESS")
             }
 
             override fun onFailure(value: Throwable?) {
+                isConnected = false
                 Log.d(javaClass.name, "PUBLISH FAILED!!! " + value.toString())
             }
         })
@@ -67,14 +70,21 @@ class CallbackMQTTClient(internal var imqttMessageReceiver: IMQTTMessageReceiver
     fun subscribe(topic: String) {
 
         Log.d("test", "subscribe():" + topic)
-        if (callbackConnection == null || topic.isEmpty()) return
-        callbackConnection!!.subscribe(arrayOf(Topic(topic, QoS.AT_LEAST_ONCE)), object : Callback<ByteArray> {
-            override fun onSuccess(bytes: ByteArray?) {
+        if ((callbackConnection == null) || topic.isEmpty()) return
+            val aaa=arrayOf(Topic(topic, QoS.AT_LEAST_ONCE));
+            try {
+                callbackConnection!!.subscribe(aaa, object : Callback<ByteArray> {
+                    override fun onSuccess(bytes: ByteArray?) {
+                    }
+
+                    override fun onFailure(throwable: Throwable?) {
+                        Log.d(javaClass.name, "subscribe failed!!! " + throwable.toString())
+                    }
+                })
             }
-            override fun onFailure(throwable: Throwable?) {
-                Log.d(javaClass.name, "subscribe failed!!! " + throwable.toString())
+            catch (e:Exception){
+
             }
-        })
     }
 
     fun subscribeMass(topicsList: ArrayList<String>) {
@@ -118,13 +128,17 @@ class CallbackMQTTClient(internal var imqttMessageReceiver: IMQTTMessageReceiver
         Log.d("test", "unsubscribe():" + topic!!)
         if (callbackConnection == null || topic.isEmpty()) return
         val topics = arrayOf(UTF8Buffer(topic))
-        callbackConnection!!.unsubscribe(topics, object : Callback<Void> {
-            override fun onSuccess(aVoid: Void?) {}
+        try {
+            callbackConnection!!.unsubscribe(topics, object : Callback<Void> {
+                override fun onSuccess(aVoid: Void?) {}
 
-            override fun onFailure(throwable: Throwable?) {
-                Log.d("test", "unsubscribe failed!!! " + throwable.toString())
-            }
-        })
+                override fun onFailure(throwable: Throwable?) {
+                    Log.d("test", "unsubscribe failed!!! " + throwable.toString())
+                }
+            })
+        }catch(e:Exception){
+
+        }
     }
 
 

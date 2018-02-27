@@ -238,10 +238,10 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
         var result = value
         try {
             result = duktape.evaluate("var value='$value'; $code; String(value);")
-            processReceiveSimplyTopicPayloadData("%js_error", "no errors");
+            processReceiveSimplyTopicPayloadData("%onJSErrors", "no errors");
         } catch (e: Exception) {
             Log.d("script", "exec: " + e)
-            processReceiveSimplyTopicPayloadData("%js_error", e.toString() );
+            processReceiveSimplyTopicPayloadData("%onJSErrors", e.toString() );
         }
 
         return result
@@ -518,32 +518,45 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
             }
         }).start()
 
-
-        //$timer
+        //$timer_1m
         Thread(Runnable {
             try {
                 Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-            var timerInterrupt=0;
             while (true) {
-
-                //processReceiveSimplyTopicPayloadData("interrupt", timerInterrupt.toString());
-                //publishMQTTMessage("interrupt", Buffer(timerInterrupt.toString().toByteArray()), true)
-                timerInterrupt++;
                 val cal=Calendar.getInstance();
                 val dateFormat = SimpleDateFormat("HH:mm")
-                processReceiveSimplyTopicPayloadData("%timer_minutes", dateFormat.format(cal.getTime()));
-
+                processReceiveSimplyTopicPayloadData("%onTimer1m()", dateFormat.format(cal.getTime()));
                 try {
                     Thread.sleep(60000)
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
-
             }
         }).start()
+
+
+        //$timer_1s
+        Thread(Runnable {
+            try {
+                Thread.sleep(1000)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+            while (true) {
+                val cal=Calendar.getInstance();
+                val dateFormat = SimpleDateFormat("HH:mm:ss")
+                processReceiveSimplyTopicPayloadData("%onTimer1s()", dateFormat.format(cal.getTime()));
+                try {
+                    Thread.sleep(1000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
+        }).start()
+
     }
 
 
@@ -856,7 +869,7 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
     override fun onReceiveMQTTMessage(topic: String, payload: Buffer) {
 
-        Log.d(javaClass.name, "onReceiveMQTTMessage() topic:" + topic+" payload:"+String(payload.toByteArray(), Charset.forName("UTF-8")))
+        //Log.d(javaClass.name, "onReceiveMQTTMessage() topic:" + topic+" payload:"+String(payload.toByteArray(), Charset.forName("UTF-8")))
 
         if (topic == SERVER_DATAPACK_NAME) {
             processUniversalPack(payload)
@@ -977,7 +990,7 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
     //OnReceive()
     internal fun processOnReceiveEvent(topic: String?, payload: String?) {
-
+        if(dashboards==null)return;
         //if (!AppSettings.instance.server_mode) return
 
         for (dashboard in dashboards!!) {
