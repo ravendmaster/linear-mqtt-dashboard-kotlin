@@ -77,12 +77,13 @@
             <TextView
                 android:id="@+id/widget_value"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
 
+                android:layout_height="match_parent"
                 android:gravity="center_vertical|end"
+                android:maxLength="30"
                 android:minWidth="48dp"
                 android:singleLine="false"
-                android:text="value"
+                android:text="value 111111111111111111111111111 222222222222222"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 tools:ignore="HardcodedText,UnusedAttribute" />
 

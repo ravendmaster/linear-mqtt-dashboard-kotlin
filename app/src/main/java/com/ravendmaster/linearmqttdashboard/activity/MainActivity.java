@@ -37,6 +37,8 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 import com.ravendmaster.linearmqttdashboard.BoardFragment;
 import com.ravendmaster.linearmqttdashboard.BuildConfig;
 import com.ravendmaster.linearmqttdashboard.ListFragment;
@@ -780,6 +782,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         density=getBaseContext().getResources().getDisplayMetrics().density;
+
+
+
     }
 
     @Override

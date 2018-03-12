@@ -9,8 +9,8 @@ android {
         applicationId 'com.ravendmaster.linearmqttdashboard'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 255
-        versionName "2.4.2"
+        versionCode 259
+        versionName "2.5.3"
     }
     buildTypes {
         release {
@@ -43,6 +43,9 @@ dependencies {
     compile 'com.squareup.duktape:duktape-android:0.9.5'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile 'com.android.support:support-compat:26.1.0'
+
+    // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

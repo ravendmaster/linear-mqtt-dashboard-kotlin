@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.os.*
 import android.support.v7.app.AppCompatActivity
 import android.util.JsonReader
+import com.jayway.jsonpath.JsonPath
+import com.jayway.jsonpath.ReadContext
 
 import com.ravendmaster.linearmqttdashboard.Utilities
 import com.ravendmaster.linearmqttdashboard.customview.Graph
@@ -85,6 +87,19 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
         override fun publishr(topic: String, payload: String) {
             publishMQTTMessage(topic, Buffer(payload.toByteArray()), true)
+        }
+    }
+
+    private var jsonPath: IJSONPath = object : IJSONPath {
+        override fun read(text: String, path: String): String {
+            val ctx = JsonPath.parse(text)
+            return ctx.read<Object>(path).toString()
+        }
+    }
+
+    private var valueData: IValue = object : IValue {
+        override fun get(): String {
+            return tempValue
         }
     }
 
@@ -233,15 +248,18 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
     }
 
+    var tempValue:String=""
+
     fun evalJS(contextWidgetData: WidgetData, value: String?, code: String): String? {
         this.contextWidgetData = contextWidgetData
         var result = value
         try {
-            result = duktape.evaluate("var value='$value'; $code; String(value);")
-            processReceiveSimplyTopicPayloadData("%onJSErrors", "no errors");
+            tempValue = value!!
+            result = duktape.evaluate("var value=ValueData.get(); $code; String(value);")
+            processReceiveSimplyTopicPayloadData("onJSErrors()", "no errors");
         } catch (e: Exception) {
             Log.d("script", "exec: " + e)
-            processReceiveSimplyTopicPayloadData("%onJSErrors", e.toString() );
+            processReceiveSimplyTopicPayloadData("onJSErrors()", e.toString() );
         }
 
         return result
@@ -257,8 +275,15 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
     internal interface INotifier {
         fun push(message: String)
-
         fun stop()
+    }
+
+    internal interface IJSONPath {
+        fun read(text: String, path: String): String
+    }
+
+    internal interface IValue {
+        fun get(): String
     }
 
     fun getServerPushNotificationTopicForTextMessage(id: String): String { //для текстовых сообщений
@@ -306,8 +331,10 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
         duktape = Duktape.create()
         duktape.bind("MQTT", IMQTT::class.java, imqtt)
         duktape.bind("Notifier", INotifier::class.java, notifier)
-        Log.d(javaClass.name, "duktape start")
+        duktape.bind("JSONPath", IJSONPath::class.java, jsonPath)
+        duktape.bind("ValueData", IValue::class.java, valueData)
 
+        Log.d(javaClass.name, "duktape start")
 
         lastReceivedMessagesByTopic = HashMap()
 
@@ -753,7 +780,7 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
         //showNotifyStatus(appSettings.push_notifications_subscribe_topic, false);
 
-        showNotifyStatus("High energy consumption.", !appSettings.server_mode)
+        showNotifyStatus("", !appSettings.server_mode) // && appSettings.push_notifications_subscribe_topic.isBlank())
 
 
         //val rootSubscribeTopic = ""//3.0 appSettings.subscribe_topic.endsWith("#") ? appSettings.subscribe_topic.substring(0, appSettings.subscribe_topic.length() - 1) : appSettings.subscribe_topic;
@@ -794,9 +821,9 @@ class MQTTService : Service(), CallbackMQTTClient.IMQTTMessageReceiver {
 
         val pendingIntent = PendingIntent.getActivity(this, 0, foreground_intent, 0)
         val builder = Notification.Builder(this)
-                .setContentTitle("Application server mode is on")
+                //.setContentTitle("Application server mode is on")
                 //.setContentTitle("Linear MQTT Dashboard")
-                //.setContentText("Application server mode is on")
+                .setContentText("Online")
                 .setSmallIcon(R.drawable.ic_playblack)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true).setSubText(text1)
